@@ -1,0 +1,31 @@
+# Usa una imagen base de Python
+FROM python:3.12.4-slim
+
+# Instala las dependencias del sistema que pueden ser necesarias
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    gcc \
+    libssl-dev \
+    libffi-dev \
+    libxml2-dev \
+    libxslt1-dev \
+    zlib1g-dev \
+    && apt-get clean
+
+# Establece el directorio de trabajo en el contenedor
+WORKDIR /app
+
+# Copia el archivo requirements.txt
+COPY requirements.txt .
+
+# Instala las dependencias de Python, respetando las versiones compatibles
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copia todo el contenido del directorio G1_ML_Airline al contenedor
+COPY ./data ./
+
+# Expone el puerto en el que Streamlit se ejecutará
+EXPOSE 8502
+
+# Comando para ejecutar la aplicación
+CMD ["data", "run", "data/modelos_entrenamiento/catboost_model.cbm"]
